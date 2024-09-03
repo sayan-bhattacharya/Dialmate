@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+<<<<<<< HEAD
 @layer utilities {
   .bg-custom-image {
     background-image: url('/pe.png');
@@ -9,3 +10,5 @@
     background-repeat: no-repeat ;
   }
 }
+=======
+>>>>>>> 21e00578808249a92bd2e81ae8ab937f11e5ed47
