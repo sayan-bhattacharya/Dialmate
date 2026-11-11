@@ -1,143 +1,111 @@
-# Dialmate
-Dialmate is an intuitive dashboard designed to analyze and display statistics of emotional states from pas Dialmate helps improve communication t conversations. The platform allows users to set reminders, track emotional trends, and receive feedback on previous conversations stored in the database. With a focus on emotional intelligence, 
+# Dialmate — Emotional Intelligence & Conversation Telemetry Platform
 
+<div align="center">
 
+[![React](https://img.shields.io/badge/Frontend-React_18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](Frontend/)
+[![Node.js](https://img.shields.io/badge/Backend-Node.js_/_Express-339933?style=for-the-badge&logo=node.js&logoColor=white)]()
+[![LLaMA-2](https://img.shields.io/badge/Inference-Local_LLaMA--2-0467DF?style=for-the-badge&logo=meta&logoColor=white)]()
+[![Flask](https://img.shields.io/badge/API-Flask_Gateway-000000?style=for-the-badge&logo=flask&logoColor=white)]()
+[![Tailwind](https://img.shields.io/badge/Styling-Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)]()
 
+**DialMate AI • Intuitive emotional telemetry and real-time conversation analytics for business communication.**
 
-# LLaMA Model Local Hosting Guide
+</div>
 
-This guide shows how to locally host the LLaMA model and interact with it using a REST API via Python, with a Node.js client to send requests.
+---
 
-## Prerequisites
+## 📌 Executive Overview
 
-- **Hardware**: GPU (recommended) or CPU (slower for large models)
-- **Python**: 3.8+
-- **Node.js**: 14.x+
+**Dialmate** is a conversational analytics platform designed to capture, analyze, and visualize emotional trends from voice and textual customer interactions. By combining local, privacy-preserving LLM inference (LLaMA-2 7B) with real-time sentiment extraction and an intuitive dashboard, Dialmate empowers teams to track emotional valence, detect escalation patterns, and surface coaching suggestions.
 
-## Steps to Host LLaMA Locally
+---
 
-### 1. Clone the Repository
+## 🏗️ Full-Stack System Architecture
+
+```mermaid
+graph TD
+    classDef client fill:#eff6ff,stroke:#1e40af,stroke-width:2px;
+    classDef backend fill:#f0fdf4,stroke:#15803d,stroke-width:2px;
+    classDef ai fill:#fefce8,stroke:#a16207,stroke-width:2px;
+    classDef db fill:#fdf2f8,stroke:#be185d,stroke-width:2px;
+
+    subgraph ClientLayer ["🖥️ Frontend Dashboard (React 18 + Vite)"]
+        UI[Agent Interface & Telemetry]
+        Charts[Emotion Trend & Valence Visualizer]
+        Feedback[Real-Time Coaching Alerts]
+    end
+
+    subgraph APILayer ["⚡ Backend Gateway (Node.js & Express)"]
+        API[Express REST Gateway]
+        Auth[JWT Session & Auth Handler]
+        DataPipe[Conversation Ingestion Service]
+    end
+
+    subgraph ModelLayer ["🤖 Local AI Inference Engine (Flask + Transformers)"]
+        FlaskAPI[Flask Inference Gateway :5000]
+        LLaMA[Meta LLaMA-2 7B Chat Model]
+        EmotionEngine[Sentiment & Valence Extraction Pipeline]
+    end
+
+    subgraph DataStorage ["💾 Persistence Layer"]
+        DB[(PostgreSQL / MongoDB)]
+    end
+
+    UI --> API
+    API --> FlaskAPI
+    FlaskAPI --> EmotionEngine --> LLaMA
+    API --> DB
+    DB --> Charts & Feedback
+
+    class UI,Charts,Feedback client;
+    class API,Auth,DataPipe backend;
+    class FlaskAPI,LLaMA,EmotionEngine ai;
+    class DB db;
+```
+
+---
+
+## ✨ Core Features
+
+1. **Local Privacy-Preserving Inference**: Host and execute LLaMA-2 locally via PyTorch and Hugging Face Transformers, ensuring sensitive audio/chat transcripts never leave your infrastructure.
+2. **Emotional Telemetry & Valence Scoring**: Classify conversation tone into structured emotional dimensions (Confidence, Hesitation, Frustration, Urgency).
+3. **Interactive React Dashboard**: Visual analytics visualizing emotional trajectories across single calls or multi-week customer interactions.
+4. **Automated Feedback & Alerts**: Real-time reminders when escalation thresholds or negative customer trends are breached.
+
+---
+
+## 🚀 Setup & Deployment
+
+### 1. Local LLaMA-2 Inference Engine (Python)
 
 ```bash
-git clone <repository-url>
-cd <repository-directory>
-
-2. Python Setup
-
-	1.	Create Virtual Environment:
-
-python3 -m venv llama_env
+# Set up Python environment
+python -m venv llama_env
 source llama_env/bin/activate  # On Windows: llama_env\Scripts\activate
 
-
-	2.	Install Python Dependencies:
-For GPU:
-
+# Install PyTorch with CUDA support (GPU recommended)
 pip install transformers torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-
-For CPU:
-
-pip install transformers torch torchvision torchaudio
-
-Install Flask for the API:
-
 pip install flask
 
-
-
-3. Download and Load LLaMA Model
-
-	1.	Request Access to LLaMA model weights via Hugging Face here.
-	2.	Load the Model in Python:
-
-from transformers import AutoModelForCausalLM, AutoTokenizer
-
-model = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-2-7b-chat-hf")
-tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-2-7b-chat-hf")
-
-
-
-4. Expose LLaMA via Flask API
-
-	1.	Create Flask API (llama_api.py):
-
-from flask import Flask, request, jsonify
-from transformers import AutoModelForCausalLM, AutoTokenizer
-
-app = Flask(__name__)
-
-model = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-2-7b-chat-hf")
-tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-2-7b-chat-hf")
-
-@app.route("/generate", methods=["POST"])
-def generate():
-    input_data = request.json
-    prompt = input_data.get("prompt", "")
-    inputs = tokenizer(prompt, return_tensors="pt")
-    outputs = model.generate(**inputs, max_new_tokens=150)
-    generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
-    return jsonify({"generated_text": generated_text})
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
-
-
-	2.	Run Flask API:
-
+# Launch the inference service
 python llama_api.py
+```
 
+### 2. Frontend Dashboard (React + Vite)
 
+```bash
+cd Frontend
+npm install
+npm run dev
+```
 
-5. Interact with the API via Node.js
+The frontend dashboard will be available at `http://localhost:5173`.
 
-	1.	Install Axios:
+---
 
-npm install axios
+## 📬 Contact & Commercial Inquiries
 
-
-	2.	Create Node.js Client (index.js):
-
-const axios = require('axios');
-
-const generateText = async (prompt) => {
-  try {
-    const response = await axios.post('http://localhost:5000/generate', {
-      prompt: prompt
-    });
-    console.log("Generated Text:", response.data.generated_text);
-  } catch (error) {
-    console.error("Error:", error);
-  }
-};
-
-generateText("What is the meaning of life?");
-
-
-	3.	Run Node.js Client:
-
-node index.js
-
-
-
-Example API Request/Response
-
-Request:
-
-POST http://localhost:5000/generate
-Content-Type: application/json
-
-{
-    "prompt": "Tell me a story about a brave knight."
-}
-
-Response:
-
-{
-    "generated_text": "Once upon a time, in a kingdom far away, there was a brave knight who..."
-}
-
-License
-
-This project is licensed under the MIT License.
-
-Feel free to use this directly!
+- **Company**: DialMate AI
+- **Website**: [dialmateai.com](https://dialmateai.com)
+- **Founder**: Sayan Bhattacharya ([sayanpm17@gmail.com](mailto:sayanpm17@gmail.com))
+- **LinkedIn**: [linkedin.com/in/snbhattacharya5](https://www.linkedin.com/in/snbhattacharya5/)
